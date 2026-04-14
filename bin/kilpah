@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Get the directory where this script is located
+BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+APP_ROOT="$( dirname "$BIN_DIR" )"
+VENV_PYTHON="$APP_ROOT/venv/bin/python"
+PID_FILE="$APP_ROOT/kilpah.pid"
+
+usage() {
+    echo "Klipah Management Tool"
+    echo ""
+    echo "Usage: kilpah <command>"
+    echo ""
+    echo "Commands:"
+    echo "  start      Start the Klipah service"
+    echo "  stop       Stop the Klipah service"
+    echo "  status     Check if Klipah is running"
+    echo "  update     Check and install updates"
+    echo "  uninstall  Remove Klipah from this system"
+    exit 1
+}
+
+case "$1" in
+    start)
+        echo "[>] Starting Klipah Service..."
+        if [ -f "$PID_FILE" ]; then
+            OLD_PID=$(cat "$PID_FILE")
+            if ps -p $OLD_PID > /dev/null; then
+                echo "[!] Klipah is already running (PID: $OLD_PID)."
+                exit 0
+            fi
+            rm "$PID_FILE"
+        fi
+
+        cd "$APP_ROOT/app"
+        nohup "$VENV_PYTHON" -m uvicorn server:app --host 0.0.0.0 --port 8000 > "$APP_ROOT/server.log" 2>&1 &
+        NEW_PID=$!
+        echo $NEW_PID > "$PID_FILE"
+        echo "[OK] Klipah started on http://localhost:8000 (PID: $NEW_PID)"
+        ;;
+    stop)
+        echo "[>] Stopping Klipah Service..."
+        if [ ! -f "$PID_FILE" ]; then
+            echo "[!] No PID file found."
+            exit 0
+        fi
+        PID=$(cat "$PID_FILE")
+        kill $PID
+        rm "$PID_FILE"
+        echo "[OK] Stopped Klipah."
+        ;;
+    status)
+        if [ -f "$PID_FILE" ]; then
+            PID=$(cat "$PID_FILE")
+            if ps -p $PID > /dev/null; then
+                echo "[*] Klipah is RUNNING (PID: $PID)"
+            else
+                echo "[*] Klipah is NOT running (stale PID file)"
+                rm "$PID_FILE"
+            fi
+        else
+            echo "[*] Klipah is NOT running"
+        fi
+        ;;
+    version)
+        cat "$APP_ROOT/app/version.txt"
+        ;;
+    update)
+        echo "[>] Checking for updates..."
+        # Logic to curl the zip from the public dist repo
+        ;;
+    uninstall)
+        read -p "[!] Are you sure you want to uninstall Kilpah? (y/N): " CONFIRM
+        if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
+            $0 stop
+            echo "[>] Removing files..."
+            rm -rf "$APP_ROOT"
+            echo "[OK] Kilpah removed."
+        fi
+        ;;
+    *)
+        usage
+        ;;
+esac
