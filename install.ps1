@@ -1,9 +1,12 @@
 # Kilpah Windows Installer (PowerShell) - Secure Edition
 $ErrorActionPreference = "Stop"
 
+# Force TLS 1.2 for GitHub connections
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $InstallDir = "$env:LOCALAPPDATA\Kilpah"
-$DistRepo = "https://github.com/Ibnuard/codename-kppjyt" # Updated to your actual repo
-$ZipUrl = "$DistRepo/raw/main/kilpah-dist.zip"
+$DistRepo = "https://github.com/Ibnuard/codename-kppjyt"
+$ZipUrl = "$DistRepo/raw/master/kilpah-dist.zip"
 $SecretKey = "Klipah-Global-Secret-Key-2026"
 
 function Get-HMACSignature($date, $secret) {

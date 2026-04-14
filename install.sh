@@ -2,8 +2,8 @@
 set -e
 
 INSTALL_DIR="$HOME/.kilpah"
-DIST_REPO="https://github.com/Ibnuard/codename-kppjyt" # Updated
-ZIP_URL="$DIST_REPO/raw/main/kilpah-dist.zip"
+DIST_REPO="https://github.com/Ibnuard/codename-kppjyt"
+ZIP_URL="$DIST_REPO/raw/master/kilpah-dist.zip"
 SECRET_KEY="Klipah-Global-Secret-Key-2026"
 
 get_hmac_signature() {
