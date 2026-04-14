@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $InstallDir = "$env:LOCALAPPDATA\Kilpah"
 $DistRepo = "https://github.com/Ibnuard/codename-kppjyt"
-$ZipUrl = "$DistRepo/raw/master/kilpah-dist.zip"
+$ZipUrl = "https://raw.githubusercontent.com/Ibnuard/codename-kppjyt/master/klipah-dist.zip"
 $SecretKey = "Klipah-Global-Secret-Key-2026"
 
 function Get-HMACSignature($date, $secret) {
