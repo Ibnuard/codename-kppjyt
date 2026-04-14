@@ -96,4 +96,4 @@ Write-Host "`n==========================================" -ForegroundColor Green
 Write-Host "       Installation Successful!            " -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host "Please restart your terminal."
-Write-Host "Then type 'kilpah start' to run."
+Write-Host "Then type 'klipah start' to run."
