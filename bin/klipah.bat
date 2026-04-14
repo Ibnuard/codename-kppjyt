@@ -75,33 +75,38 @@ exit /b 0
 
 :stop
 echo [^>] Stopping Klipah Service...
-if not exist "%PID_FILE%" (
-    echo [!] No PID file found. Klipah may not be running.
-    exit /b 0
-)
+if not exist "%PID_FILE%" goto no_pid
 set /p PID=<"%PID_FILE%"
 taskkill /F /PID %PID% /T >nul 2>&1
-if not errorlevel 1 (
-    echo [OK] Stopped Klipah (PID: %PID%).
-) else (
-    echo [!] Could not stop process %PID%. It may have already exited.
-)
+if errorlevel 1 goto stop_fail
+echo [OK] Stopped Klipah (PID: %PID%).
 del "%PID_FILE%" 2>nul
 exit /b 0
 
+:stop_fail
+echo [!] Could not stop process %PID%. It may have already exited.
+del "%PID_FILE%" 2>nul
+exit /b 0
+
+:no_pid
+echo [!] No PID file found. Klipah may not be running.
+exit /b 0
+
 :status
-if not exist "%PID_FILE%" (
-    echo [*] Klipah is NOT running.
-    exit /b 0
-)
+if not exist "%PID_FILE%" goto no_pid_stat
 set /p PID=<"%PID_FILE%"
 tasklist /FI "PID eq %PID%" 2>nul | findstr /i "python" >nul
-if errorlevel 1 (
-    echo [*] Klipah is NOT running (stale PID file).
-    del "%PID_FILE%" 2>nul
-) else (
-    echo [*] Klipah is RUNNING (PID: %PID%)
-)
+if errorlevel 1 goto stat_stale
+echo [*] Klipah is RUNNING (PID: %PID%)
+exit /b 0
+
+:stat_stale
+echo [*] Klipah is NOT running (stale PID file).
+del "%PID_FILE%" 2>nul
+exit /b 0
+
+:no_pid_stat
+echo [*] Klipah is NOT running.
 exit /b 0
 
 :update
