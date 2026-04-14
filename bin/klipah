@@ -2,14 +2,14 @@
 
 # Get the directory where this script is located
 BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-APP_ROOT="$( dirname "$BIN_DIR" )"
-VENV_PYTHON="$APP_ROOT/venv/bin/python"
-PID_FILE="$APP_ROOT/kilpah.pid"
+APP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+VENV_PYTHON="$APP_ROOT/venv/bin/python3"
+PID_FILE="$APP_ROOT/klipah.pid"
 
 usage() {
     echo "Klipah Management Tool"
     echo ""
-    echo "Usage: kilpah <command>"
+    echo "Usage: klipah <command>"
     echo ""
     echo "Commands:"
     echo "  start      Start the Klipah service"

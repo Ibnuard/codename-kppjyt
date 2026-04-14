@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 set BIN_DIR=%~dp0
 set APP_ROOT=%BIN_DIR%..
 set VENV_PYTHON=%APP_ROOT%\venv\Scripts\python.exe
-set PID_FILE=%APP_ROOT%\kilpah.pid
+set PID_FILE=%APP_ROOT%\klipah.pid
 
 if "%1"=="start" goto start
 if "%1"=="stop" goto stop
@@ -17,7 +17,7 @@ if "%1"=="version" goto version
 :usage
 echo Klipah Management Tool
 echo.
-echo Usage: kilpah ^<command^>
+echo Usage: klipah ^<command^>
 echo.
 echo Commands:
 echo   start      Start the Klipah service
