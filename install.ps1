@@ -68,8 +68,8 @@ Invoke-WebRequest -Uri $ZipUrl -OutFile $LocalZip
 Write-Host "[>] Extracting..."
 Expand-Archive -Path $LocalZip -DestinationPath $InstallDir -Force
 
-# Save License Key
-$key | Out-File -FilePath "$InstallDir\license.txt" -Encoding utf8
+# Save License Key (pure ASCII, no BOM)
+[IO.File]::WriteAllText("$InstallDir\license.txt", $key.Trim())
 
 # 4. Setup Venv
 Write-Host "[>] Initializing Virtual Environment (this may take a few mins)..."
