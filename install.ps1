@@ -83,11 +83,13 @@ if (!(Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host "[>] FFmpeg missing. Downloading local copy..."
 }
 
-# 6. PATH
+Write-Host "`n[>] --- 6/6 Adding Klipah to PATH ---"
 $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($UserPath -notlike "*$InstallDir\bin*") {
     [Environment]::SetEnvironmentVariable("Path", $UserPath + ";$InstallDir\bin", "User")
-    Write-Host "[OK] PATH updated." -ForegroundColor Green
+    Write-Host "[OK] Klipah added to User PATH." -ForegroundColor Green
+} else {
+    Write-Host "[*] Klipah is already in PATH." -ForegroundColor Gray
 }
 
 Write-Host "`n==========================================" -ForegroundColor Green
