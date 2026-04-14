@@ -2,7 +2,7 @@
 set -e
 
 INSTALL_DIR="$HOME/.kilpah"
-DIST_REPO="https://github.com/Ibnuard/kilpah-dist" # <--- UPDATED
+DIST_REPO="https://github.com/Ibnuard/codename-kppjyt" # Updated
 ZIP_URL="$DIST_REPO/raw/main/kilpah-dist.zip"
 SECRET_KEY="Klipah-Global-Secret-Key-2026"
 

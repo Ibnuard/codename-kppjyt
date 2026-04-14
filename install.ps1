@@ -2,7 +2,7 @@
 $ErrorActionPreference = "Stop"
 
 $InstallDir = "$env:LOCALAPPDATA\Kilpah"
-$DistRepo = "https://github.com/Ibnuard/kilpah-dist" # <--- UPDATED
+$DistRepo = "https://github.com/Ibnuard/codename-kppjyt" # Updated to your actual repo
 $ZipUrl = "$DistRepo/raw/main/kilpah-dist.zip"
 $SecretKey = "Klipah-Global-Secret-Key-2026"
 
@@ -78,8 +78,6 @@ python -m venv venv
 # 5. FFmpeg Check/Download
 if (!(Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host "[>] FFmpeg missing. Downloading local copy..."
-    # Simple direct download placeholder - we'll recommend user install for now or provide binary in ZIP
-    # For now, we assume user might have it or we tell them how to get it.
 }
 
 # 6. PATH
