@@ -41,7 +41,16 @@ if (!(Get-Command python -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# 3. Download & Install
+# 3. Stop running services & Download
+Write-Host "[>] Stopping any existing Klipah background services..."
+# Look for Klipah PID if it exists
+if (Test-Path "$InstallDir\klipah.pid") {
+    $pidToKill = Get-Content "$InstallDir\klipah.pid"
+    Stop-Process -Id $pidToKill -Force -ErrorAction SilentlyContinue
+}
+# Backup kill for any orphaned python processes in that dir
+Get-Process python -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*$InstallDir*" } | Stop-Process -Force -ErrorAction SilentlyContinue
+
 Write-Host "[>] Downloading Kilpah package..."
 if (!(Test-Path $InstallDir)) { New-Item -ItemType Directory -Path $InstallDir -Force }
 $LocalZip = "$env:TEMP\kilpah.zip"
