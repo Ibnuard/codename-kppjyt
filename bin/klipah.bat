@@ -20,6 +20,7 @@ if "%1"=="uninstall" goto uninstall
 if "%1"=="status" goto status
 if "%1"=="version" goto version
 if "%1"=="token" goto token
+if "%1"=="cookie" goto cookie
 goto usage
 
 :usage
@@ -34,6 +35,7 @@ echo   update     Check and install updates
 echo   uninstall  Remove Klipah from this system
 echo   version    Display the current version
 echo   token      Update your license: klipah token ^<your-base64-token^>
+echo   cookie     Inject browser cookies to bypass YouTube bot detection
 exit /b 1
 
 :version
@@ -138,6 +140,28 @@ if not exist "%APP_ROOT%\app\server.py" (
     )
 )
 echo %ESC%[32m[OK] You may now use 'klipah start'.%ESC%[0m
+exit /b 0
+
+:cookie
+if "%2"=="" (
+    echo %ESC%[31m[!] Missing path to cookie file.%ESC%[0m
+    echo %ESC%[33mUsage: klipah cookie ^<path-to-cookies.txt^>%ESC%[0m
+    exit /b 1
+)
+
+:: Validate file exists
+if not exist "%~2" (
+    echo %ESC%[31m[!] File not found: "%~2"%ESC%[0m
+    exit /b 1
+)
+
+:: Copy into app payload root
+copy /Y "%~2" "%APP_ROOT%\app\cookies.txt" >nul
+if errorlevel 1 (
+    echo %ESC%[31m[!] Failed to copy cookie file. Try running terminal as Administrator.%ESC%[0m
+    exit /b 1
+)
+echo %ESC%[32m[OK] Cookie integrated successfully! Klipah is now immune to YouTube IP blocks.%ESC%[0m
 exit /b 0
 
 :update
