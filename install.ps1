@@ -60,17 +60,19 @@ python -m venv venv
 .\venv\Scripts\python.exe -m pip install --upgrade pip
 .\venv\Scripts\python.exe -m pip install -r .\app\requirements.txt
 
+$CleanInstallDir = $InstallDir.Replace('\', '\\')
+
 Write-Host "[>] Activating License Token..."
 $py_script = @"
 import os, sys
-sys.path.append(os.path.join('$InstallDir', 'app'))
+sys.path.append(os.path.join('$CleanInstallDir', 'app'))
 from src.license_utils import activate_token
-with open(os.path.join('$InstallDir', 'temp_token.txt'), 'r') as f:
+with open(os.path.join('$CleanInstallDir', 'temp_token.txt'), 'r') as f:
     token = f.read().strip()
-success, msg = activate_token(token, '$InstallDir')
+success, msg = activate_token(token, '$CleanInstallDir')
 if success:
     print('\n[OK] ' + msg)
-    os.remove(os.path.join('$InstallDir', 'temp_token.txt'))
+    os.remove(os.path.join('$CleanInstallDir', 'temp_token.txt'))
 else:
     print('\n[ERROR] ' + msg)
     sys.exit(1)
