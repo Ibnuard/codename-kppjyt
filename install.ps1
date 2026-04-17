@@ -23,32 +23,14 @@ Write-Host "==========================================" -ForegroundColor Cyan
 # 1. License Prompt
 $isValid = $false
 while (!$isValid) {
-    $key = Read-Host "Please enter your License Key"
-    if ($key -like "*-*") {
-        $parts = $key.Split("-")
-        $expiryStr = $parts[0]
-        $signature = $parts[1]
-        
-        # Verify Signature
-        $expected = Get-HMACSignature $expiryStr $SecretKey
-        if ($signature.ToUpper() -eq $expected) {
-            # Check Expiry
-            try {
-                $expiryDate = [datetime]::ParseExact($expiryStr, "yyyyMMdd", $null)
-                if ((Get-Date) -lt $expiryDate) {
-                    $isValid = $true
-                    Write-Host "[OK] License valid until $($expiryDate.ToString('dd-MM-yyyy'))" -ForegroundColor Green
-                } else {
-                    Write-Host "[!] License EXPIRED on $($expiryDate.ToString('dd-MM-yyyy'))" -ForegroundColor Red
-                }
-            } catch {
-                Write-Host "[!] Invalid date format in key." -ForegroundColor Red
-            }
-        } else {
-            Write-Host "[!] Invalid license signature." -ForegroundColor Red
-        }
+    $key = Read-Host "Please enter your Secure Token"
+    
+    # Simple length check (base64 is usually > 30 chars), will be validated properly by Python later.
+    if ($key.Length -gt 10) {
+        $isValid = $true
+        Write-Host "[OK] Token format accepted. Will be activated during setup." -ForegroundColor Green
     } else {
-        Write-Host "[!] Invalid key format. Expected: YYYYMMDD-XXXXXX" -ForegroundColor Red
+        Write-Host "[!] Invalid token." -ForegroundColor Red
     }
 }
 
@@ -68,8 +50,8 @@ Invoke-WebRequest -Uri $ZipUrl -OutFile $LocalZip
 Write-Host "[>] Extracting..."
 Expand-Archive -Path $LocalZip -DestinationPath $InstallDir -Force
 
-# Save License Key (pure ASCII, no BOM)
-[IO.File]::WriteAllText("$InstallDir\license.txt", $key.Trim())
+# Save the Token locally for python setup
+[IO.File]::WriteAllText("$InstallDir\temp_token.txt", $key.Trim())
 
 # 4. Setup Venv
 Write-Host "[>] Initializing Virtual Environment (this may take a few mins)..."
@@ -78,6 +60,29 @@ python -m venv venv
 .\venv\Scripts\python.exe -m pip install --upgrade pip
 .\venv\Scripts\python.exe -m pip install -r .\app\requirements.txt
 
+Write-Host "[>] Activating License Token..."
+$py_script = @"
+import os, sys
+sys.path.append(os.path.join('$InstallDir', 'app'))
+from src.license_utils import activate_token
+with open(os.path.join('$InstallDir', 'temp_token.txt'), 'r') as f:
+    token = f.read().strip()
+success, msg = activate_token(token, '$InstallDir')
+if success:
+    print('\n[OK] ' + msg)
+    os.remove(os.path.join('$InstallDir', 'temp_token.txt'))
+else:
+    print('\n[ERROR] ' + msg)
+    sys.exit(1)
+"@
+
+.\venv\Scripts\python.exe -c $py_script
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[!] Token activation failed. Please check your token or contact support." -ForegroundColor Red
+    # Cleanup temp installation since token failed
+    Remove-Item -Path $InstallDir -Recurse -Force
+    exit 1
+}
 # 5. FFmpeg Check/Download
 if (!(Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host "[>] FFmpeg missing. Downloading local copy..."
